@@ -27,7 +27,6 @@ io.on('connection', function(client){
 		} else {
 			sh.stdin.write(data+"\n");
 		}
-		io.emit('message', Buffer.from("[david@s4n]$ " + data));
 	});
 
 });

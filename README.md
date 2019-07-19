@@ -10,11 +10,13 @@ This has been configured to run in localhost, but it should be easy to make it c
 
 ## How to run
 
-1. Run the backend
+1. Run the backend which you can find in the **server** directory.
 ```bash
 $ npm install
 ```
-2. Open one client from a browser.
+2. Open one client from a browser which you can find in the **clients** directory.
+	- **basic_client**: p5.js based client which uses html elements.
+	- **p5_client**: p5.js based client which uses an html canvas.
 
 ## Problems
 

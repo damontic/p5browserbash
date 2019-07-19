@@ -37,7 +37,7 @@ function enterWasPressed() {
       updateScreen();
       break;
     case "history":
-      addContent([PS0 + "history"].concat(command_history).join("\n"));
+      addContent(command_history.join("\n"));
       updateScreen();
       break;
     default:
@@ -86,7 +86,7 @@ function initInput() {
 }
 
 function addContent(bashOutput) {
-  let p = createP(bashOutput);
+  let p = createP(PS0 + input.value() + "\n" + bashOutput);
   p.style("white-space", "pre-wrap");
   p.style("color", "#ffffff");
   p.style("font-size", "16px");
