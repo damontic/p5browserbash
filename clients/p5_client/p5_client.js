@@ -15,54 +15,62 @@ socket.on('message', function(data) {
 });
 
 // p5 canvas
+const BLOCKED_KEYS = [...Array(12).keys()].map(x => 112 + x);
 const PS0 = "[david@s4n]$ ";
-let input;
-let command_history;
-let command_history_index;
-let vScale;
-let input_y;
+
+let command_history = [];
+let command_history_index = -1;
+let canvas_width = 800;
+let canvas_height = 600;
+let last_input;
+
+let p5_input;
+let p5_result;
 
 function setup() {
-  input = PS0;
-  command_history = [];
-  command_history_index = -1;
-  vScale = 80 / 100;
-  input_y = textSize();
+  createCanvas(canvas_width, canvas_height);
+  background(51);
 
-  createCanvas(screen.width * vScale, screen.height * vScale);
-  background(0,0,0);
+  p5_result = new BashString(PS0, 0, textLeading());
+  p5_input = new BashString("", p5_result.width, textLeading());
 };
 
 function draw() {
-  background(0,0,0);
-  fill(255, 255, 255);  
-  text(input, textSize(), textSize());
+  background(51);
+  p5_input.draw();
+  p5_result.draw();
 }
 
 function enterWasPressed() {
-  let com = getCommandFromInput();
-  command_history.push(com);
-  switch(com) {
+  let input = p5_input.buildString();
+  command_history.push(input);
+  switch(input) {
     case "clear":
-      input = PS0;
+      p5_result.removeAll();
+      p5_result.appendString(PS0);
+      p5_input.setY(1);
       break;
     case "history":
-      addContent(command_history.join("\n"));
+      last_input = input;
+      addContent(concat(command_history, "").join("\n"));
+      break;
+    case "animate":
+      p5_result.animate();
+      break;
+    case "stopanimate":
+      p5_result.stopAnimate();
       break;
     default:
-      socket.send(com);
+      socket.send(input);
   }
-}
-
-function upArrowWasPressed() {
-  if (command_history_index === -1) 
-    command_history_index = command_history.length - 1;
-  let com = getCommandFromInput();
-  input = input.substring(0, input.length - 1 - com.length) + " " + command_history[command_history_index];
-  command_history_index--;
+  last_input = input;
+  p5_input.removeAll();
 }
 
 function keyPressed() {
+  if ( BLOCKED_KEYS.indexOf(keyCode) != -1 )
+    return;
+
   switch(keyCode) {
     case ENTER:
       enterWasPressed();
@@ -71,9 +79,7 @@ function keyPressed() {
       upArrowWasPressed();
       break;
     case BACKSPACE:
-      let com = getCommandFromInput();
-      if (input.length > input.length - com.length)
-        input = input.substring(0, input.length - 1);
+      p5_input.removeLastCharacter();
       break;
     case ALT:
     case CONTROL:
@@ -87,15 +93,20 @@ function keyPressed() {
     case RIGHT_ARROW:
       break;
     default:
-      input += key;
+      p5_input.addCharacter(key);
   }
 };
 
 function addContent(content) {
-  input = input + "\n" + content + "\n" + PS0;
+  p5_result.appendString(last_input + "\n" + content + PS0);
+  let p5_result_line_count = p5_result.getLeadingNewLinesFromIndex(p5_result.length()) + 1;
+  p5_input.setY(p5_result_line_count);
 };
 
-function getCommandFromInput() {
-  let regex_result = input.match(/.*\$(.*)$/);
-  return regex_result[regex_result.length-1].trim();
+function upArrowWasPressed() {
+  if (command_history_index === -1) 
+    command_history_index = command_history.length - 1;
+  p5_input.removeAll();
+  p5_input.appendString(command_history[command_history_index]);
+  command_history_index--;
 }
