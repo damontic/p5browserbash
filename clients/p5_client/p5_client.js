@@ -15,21 +15,24 @@ socket.on('message', function(data) {
 });
 
 // p5 canvas
-const BLOCKED_KEYS = [...Array(12).keys()].map(x => 112 + x);
+const BLOCKED_KEYS = [...Array(12).keys()].map(x => 112 + x).concat([91, 20, 225]);
 const PS0 = "[david@s4n]$ ";
 
 let command_history = [];
 let command_history_index = -1;
-let canvas_width = 800;
+let canvas_width = screen.width;
 let canvas_height = 600;
 let last_input;
 
 let p5_input;
 let p5_result;
 
+let font_size = 16;
+
 function setup() {
   createCanvas(canvas_width, canvas_height);
   background(51);
+  textSize(font_size);
 
   p5_result = new BashString(PS0, 0, textLeading());
   p5_input = new BashString("", p5_result.width, textLeading());

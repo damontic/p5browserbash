@@ -40,6 +40,7 @@ class BashString {
 	}
 
 	appendString(sentence) {
+		if (sentence == undefined) return;
 		for (var i = 0; i < sentence.length; i++) {
 			this.addCharacter(sentence[i]);
 		}
